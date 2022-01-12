@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels: &applabels
+    app: vsphere-event-stream-prototype
+  name: vsphere-event-stream
+spec:
+  replicas: 1
+  selector:
+    matchLabels: *applabels
+  template:
+    metadata:
+      labels: *applabels
+    spec:
+      containers:
+        - image: ko://github.com/embano1/vsphere-event-streaming/cmd/server
+          name: stream-server
+          env:
+            - name: VCENTER_INSECURE
+              value: "true"
+            - name: VCENTER_URL
+              value: "https://vcsim.vcenter-stream.svc.cluster.local"
+            - name: PORT
+              value: "8080" #default
+            - name: VCENTER_STREAM_BEGIN
+              value: "5m" # default
+            - name: LOG_MAX_RECORD_SIZE_BYTES
+              value: "524288" # default (512Kb)
+            - name: LOG_MAX_SEGMENT_SIZE
+              value: "1000" # default
+            - name: DEBUG
+              value: "true" # print debug logs
+            - name: VCENTER_SECRET_PATH
+              value: "/var/bindings/vsphere" # this is the default path
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: credentials
+              mountPath: /var/bindings/vsphere # this is the default path
+              readOnly: true
+      volumes:
+        - name: credentials
+          secret:
+            secretName: vsphere-credentials
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels: &applabels
+    app: vsphere-event-stream-prototype
+  name: vsphere-event-stream
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector: *applabels
