@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/cloudevents/sdk-go/v2 v2.8.0
-	github.com/embano1/memlog v0.2.0
+	github.com/embano1/memlog v0.4.3
 	github.com/embano1/vsphere v0.2.0
 	github.com/google/uuid v1.3.0
 	github.com/julienschmidt/httprouter v1.3.0
@@ -15,7 +15,7 @@ require (
 )
 
 require (
-	github.com/benbjohnson/clock v1.1.0 // indirect
+	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.11 // indirect
