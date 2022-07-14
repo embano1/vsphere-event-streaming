@@ -11,12 +11,14 @@ jobs:
     name: Create release and artifacts (release.yaml and GCR Container Image)
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      KO_DOCKER_REPO: us.gcr.io/daisy-284300/veba/vsphere-event-stream
 
     steps:
       - name: Setup ko
-        uses: imjasonh/setup-ko@2c3450ca27f6e6f2b02e72a40f2163c281a1f675 # v0.4 tag, will install latest ko version
+        # will install latest ko version and by default login/configure for ghcr.io
+        uses: imjasonh/setup-ko@2c3450ca27f6e6f2b02e72a40f2163c281a1f675
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@48866aa521d8bf870604709cd43ec2f602d03ff2
 
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -26,16 +28,6 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Login to GCP
-        uses: google-github-actions/setup-gcloud@master
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_email: ${{ secrets.GCP_EMAIL }}
-          service_account_key: ${{ secrets.GCP_CREDENTIALS }}
-
-      - name: Configure Docker
-        run: gcloud auth configure-docker --quiet
-
       - name: Get short COMMIT and TAG
         run: |
           echo "KO_COMMIT=$(echo -n $GITHUB_SHA | cut -c -8)" >> $GITHUB_ENV
@@ -44,7 +36,16 @@ jobs:
       - name: Build and Publish Worker Image
         run: |
           # build, push and create release YAML
-          ko resolve --tags ${KO_TAG},${KO_COMMIT},latest -BRf config/ > release.yaml
+          ko resolve --tags ${KO_TAG},${KO_COMMIT},latest --bare Rf config/ > release.yaml
+
+          # extract digest from release used during signing
+          echo "KO_DIGEST=$(grep -ohe "${KO_DOCKER_REPO}.*" release.yaml)" >> $GITHUB_ENV
+
+      - name: Sign Images
+        env:
+          COSIGN_EXPERIMENTAL: 1 # OIDC support
+        run: |
+          cosign sign -a commit=$GITHUB_SHA -a tag=$KO_TAG $KO_DIGEST
       
       - name: Create Github Release and upload assets
         env:
