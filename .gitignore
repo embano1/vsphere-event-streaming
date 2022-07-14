@@ -17,3 +17,7 @@
 # secrets
 username
 password
+
+# binaries
+cmd/client/client
+cmd/server/server
