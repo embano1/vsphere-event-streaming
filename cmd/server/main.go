@@ -24,28 +24,29 @@ import (
 )
 
 const (
-	eventFormat  = "vmware.vsphere.%s.v0"
-	pollInterval = time.Second // poll vcenter events
+	eventFormat = "vmware.vsphere.%s.v0"
 )
+
+var pollInterval = time.Second // poll vcenter events
 
 func main() {
 	var env envConfig
 	if err := envconfig.Process("", &env); err != nil {
-		panic("process environment variables: " + err.Error())
+		panic("could not process environment variables: " + err.Error())
 	}
 
 	var l *zap.Logger
 	if env.Debug {
 		zapLogger, err := zap.NewDevelopment()
 		if err != nil {
-			panic("unable to create logger: " + err.Error())
+			panic("could not create logger: " + err.Error())
 		}
 		l = zapLogger
 
 	} else {
 		zapLogger, err := zap.NewProduction()
 		if err != nil {
-			panic("unable to create logger: " + err.Error())
+			panic("could not create logger: " + err.Error())
 		}
 		l = zapLogger
 	}
@@ -57,11 +58,11 @@ func main() {
 
 	srv, err := newServer(ctx, env.Port)
 	if err != nil {
-		l.Fatal("create server", zap.Error(err))
+		l.Fatal("could not create server", zap.Error(err))
 	}
 
 	if err = run(ctx, srv); err != nil && !errors.Is(err, context.Canceled) {
-		l.Fatal("run server", zap.Error(err))
+		l.Fatal("could not run server", zap.Error(err))
 	}
 }
 
@@ -84,7 +85,7 @@ func run(ctx context.Context, srv *server) error {
 		if err := srv.stop(shutdownCtx); err != nil {
 			l.Error("could not gracefully stop server", zap.Error(err))
 		}
-		return nil
+		return egCtx.Err()
 	})
 
 	var once sync.Once

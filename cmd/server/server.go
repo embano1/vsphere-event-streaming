@@ -37,12 +37,17 @@ type server struct {
 	log  *memlog.Log
 }
 
+type logRange struct {
+	Earliest memlog.Offset `json:"earliest"`
+	Latest   memlog.Offset `json:"latest"`
+}
+
 type envConfig struct {
 	RecordSize  int           `envconfig:"LOG_MAX_RECORD_SIZE_BYTES" required:"true" default:"524288"`
 	SegmentSize int           `envconfig:"LOG_MAX_SEGMENT_SIZE" required:"true" default:"1000"`
 	StreamBegin time.Duration `envconfig:"VCENTER_STREAM_BEGIN" required:"true" default:"10m"`
 	Port        int           `envconfig:"PORT" required:"true" default:"8080"`
-	Debug bool `envconfig:"DEBUG" default:"false"`
+	Debug       bool          `envconfig:"DEBUG" default:"false"`
 }
 
 func newServer(ctx context.Context, port int) (*server, error) {
@@ -100,7 +105,7 @@ func (s *server) stop(ctx context.Context) error {
 // if "watch=true" starts streaming from next (latest+1)
 // if "watch=true" and a valid "offset" is specified starts streaming from offset
 func (s *server) getEvents(ctx context.Context) httprouter.Handle {
-	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		var watch bool
 
 		if val := r.FormValue(watchKey); val != "" {
@@ -299,12 +304,7 @@ func (s *server) getEvent(ctx context.Context) httprouter.Handle {
 
 // 204 on empty log
 func (s *server) getRange(ctx context.Context) httprouter.Handle {
-	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		type logRange struct {
-			Earliest memlog.Offset `json:"earliest"`
-			Latest   memlog.Offset `json:"latest"`
-		}
-
+	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		rctx := r.Context()
 		earliest, latest := s.log.Range(rctx)
 
