@@ -17,9 +17,6 @@ jobs:
         # will install latest ko version and by default login/configure for ghcr.io
         uses: imjasonh/setup-ko@2c3450ca27f6e6f2b02e72a40f2163c281a1f675
 
-      - name: Install Cosign
-        uses: sigstore/cosign-installer@48866aa521d8bf870604709cd43ec2f602d03ff2
-
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
@@ -38,15 +35,6 @@ jobs:
           # build, push and create release YAML
           ko resolve --tags ${KO_TAG},${KO_COMMIT},latest --bare -Rf config/ > release.yaml
 
-          # extract digest from release used during signing
-          echo "KO_DIGEST=$(grep -ohe "${KO_DOCKER_REPO}.*" release.yaml)" >> $GITHUB_ENV
-
-      - name: Sign Images
-        env:
-          COSIGN_EXPERIMENTAL: 1 # OIDC support
-        run: |
-          cosign sign -a commit=$GITHUB_SHA -a tag=$KO_TAG $KO_DIGEST
-      
       - name: Create Github Release and upload assets
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
