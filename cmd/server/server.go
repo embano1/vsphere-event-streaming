@@ -50,7 +50,7 @@ type envConfig struct {
 	Debug       bool          `envconfig:"DEBUG" default:"false"`
 }
 
-func newServer(ctx context.Context, port int) (*server, error) {
+func newServer(ctx context.Context, address string) (*server, error) {
 	var srv server
 	vc, err := client.New(ctx)
 	if err != nil {
@@ -63,9 +63,8 @@ func newServer(ctx context.Context, port int) (*server, error) {
 	router.GET(apiPath+"/events/:id", srv.getEvent(ctx))
 	router.GET(apiPath+"/range", srv.getRange(ctx))
 
-	bindAddr := fmt.Sprintf("0.0.0.0:%d", port)
 	h := http.Server{
-		Addr:         bindAddr,
+		Addr:         address,
 		Handler:      router,
 		ReadTimeout:  readTimeout,
 		WriteTimeout: streamTimeout,

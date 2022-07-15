@@ -9,8 +9,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/embano1/memlog v0.4.3 h1:riVTumM3e3/qBrsKYsml7sSJYvCm6z4V4+4C3hRk0aA=
 github.com/embano1/memlog v0.4.3/go.mod h1:yDNCaHBS5MqgHjF5SRlCibLaGqSrcC9DjG3AomLj+bk=
-github.com/embano1/vsphere v0.2.3 h1:zFqG85PZsPyu1EVPq6WHwtmyVxkM+NUD4F5bwl419vA=
-github.com/embano1/vsphere v0.2.3/go.mod h1:+xavYhmRnFo2wHDGC//Ht/WsJVwqUmXzBXZNY+1YHaQ=
+github.com/embano1/vsphere v0.2.4 h1:h19uT62wxZkVOFBpvpFG98D8Fm/7h5iptm3j77ZFD+w=
+github.com/embano1/vsphere v0.2.4/go.mod h1:A1M+PubKxIb2FquVeC7qNZn0H2sK0H/YXiPa7LHxs00=
 github.com/google/go-cmp v0.5.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.8 h1:e6P7q2lk1O+qJJb4BtCQXlK8vWEO8V1ZeuEdJNOqZyg=
