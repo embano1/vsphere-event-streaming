@@ -36,7 +36,7 @@ jobs:
       - name: Build and Publish Worker Image
         run: |
           # build, push and create release YAML
-          ko resolve --tags ${KO_TAG},${KO_COMMIT},latest --bare Rf config/ > release.yaml
+          ko resolve --tags ${KO_TAG},${KO_COMMIT},latest --bare -Rf config/ > release.yaml
 
           # extract digest from release used during signing
           echo "KO_DIGEST=$(grep -ohe "${KO_DOCKER_REPO}.*" release.yaml)" >> $GITHUB_ENV
