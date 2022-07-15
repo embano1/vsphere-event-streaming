@@ -2,15 +2,19 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
-	"github.com/embano1/memlog"
+	ce "github.com/cloudevents/sdk-go/v2"
 	"github.com/embano1/vsphere/client"
 	"github.com/embano1/vsphere/logger"
+	"github.com/julienschmidt/httprouter"
 	"github.com/vmware/govmomi/simulator"
 	_ "github.com/vmware/govmomi/vapi/simulator"
 	"github.com/vmware/govmomi/vim25"
@@ -36,7 +40,7 @@ func Test_run(t *testing.T) {
 			ctx = logger.Set(ctx, zaptest.NewLogger(t))
 
 			pollInterval = time.Millisecond * 10
-			ctx, cancel := context.WithTimeout(ctx, time.Second)
+			ctx, cancel := context.WithCancel(ctx)
 			defer cancel()
 
 			t.Setenv("VCENTER_URL", vimclient.URL().String())
@@ -46,23 +50,46 @@ func Test_run(t *testing.T) {
 			vc, err := client.New(ctx)
 			assert.NilError(t, err)
 
-			log, err := memlog.New(ctx)
+			const address = "127.0.0.1:8080"
+			srv, err := newServer(ctx, address)
 			assert.NilError(t, err)
 
-			srv := server{
-				http: &http.Server{
-					Addr: "127.0.0.1:0",
-				},
-				vc:  vc,
-				log: log,
-			}
+			srv.vc = vc
 
-			err = run(ctx, &srv)
-			assert.ErrorType(t, err, context.DeadlineExceeded)
+			runErrCh := make(chan error)
+			go func() {
+				runErrCh <- run(ctx, srv)
+			}()
 
-			// check the server (log) received events from VC
-			_, latest := log.Range(context.TODO())
-			assert.Assert(t, latest != -1)
+			// give server time to initialize event stream log
+			time.Sleep(time.Second)
+
+			wanteventID := "20"
+			rec := httptest.NewRecorder()
+			req := httptest.NewRequest(
+				http.MethodGet,
+				fmt.Sprintf("http://%s/api/v1/events/%s", address, wanteventID),
+				nil,
+			)
+
+			h := srv.getEvent(ctx)
+			h(rec, req, httprouter.Params{{
+				Key:   "id",
+				Value: wanteventID,
+			}})
+
+			assert.Equal(t, rec.Code, http.StatusOK)
+
+			var gotevent ce.Event
+			err = json.NewDecoder(rec.Body).Decode(&gotevent)
+			assert.NilError(t, err)
+			assert.NilError(t, gotevent.Validate())
+			assert.Equal(t, gotevent.ID(), wanteventID)
+
+			// stop server
+			cancel()
+			err = <-runErrCh
+			assert.ErrorContains(t, err, "context canceled")
 
 			return nil
 		})
