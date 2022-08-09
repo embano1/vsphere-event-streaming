@@ -11,8 +11,8 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/vmware/govmomi v0.29.0
-	go.uber.org/zap v1.21.0
-	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f
+	go.uber.org/zap v1.22.0
+	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
 	gotest.tools/v3 v3.3.0
 )
 
