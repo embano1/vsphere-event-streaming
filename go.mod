@@ -13,7 +13,7 @@ require (
 	github.com/vmware/govmomi v0.29.0
 	go.uber.org/zap v1.22.0
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
-	gotest.tools/v3 v3.3.0
+	gotest.tools/v3 v3.4.0
 )
 
 require (
