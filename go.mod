@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/cloudevents/sdk-go/v2 v2.12.0
-	github.com/embano1/memlog v0.4.3
+	github.com/embano1/memlog v0.4.4
 	github.com/embano1/vsphere v0.2.4
 	github.com/google/go-cmp v0.5.9
 	github.com/google/uuid v1.3.0
@@ -12,7 +12,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/vmware/govmomi v0.29.0
 	go.uber.org/zap v1.24.0
-	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
+	golang.org/x/sync v0.1.0
 	gotest.tools/v3 v3.4.0
 )
 
