@@ -3,7 +3,7 @@ module github.com/embano1/vsphere-event-streaming
 go 1.17
 
 require (
-	github.com/cloudevents/sdk-go/v2 v2.13.0
+	github.com/cloudevents/sdk-go/v2 v2.14.0
 	github.com/embano1/memlog v0.4.4
 	github.com/embano1/vsphere v0.2.5
 	github.com/google/go-cmp v0.5.9
